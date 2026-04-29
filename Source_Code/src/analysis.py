@@ -13,17 +13,22 @@ output_path = "../outputs/"
 
 def load_and_clean_data():
     conn = sqlite3.connect('players.db')
-    df = pd.read_sql("SELECT * FROM player_stats", conn)
+    query = """
+        SELECT ps.*, pv.transfer_value
+        FROM player_stats ps
+        LEFT JOIN player_values pv ON ps.player = pv.player
+    """
+
+    df = pd.read_sql(query, conn)
     conn.close()
 
     df.replace('N/a', np.nan, inplace=True)
     
-    cols_to_exclude = ['player', 'team', 'nation', 'pos', 'age']
+    cols_to_exclude = ['player', 'team', 'nationality', 'position', 'matches', 'transfer_value']
     numeric_cols = [col for col in df.columns if col not in cols_to_exclude]
     
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
-        
 
     df.fillna(0, inplace=True)
     return df, numeric_cols
@@ -32,62 +37,38 @@ def team_statistics(df, numeric_cols):
     print("--- Đang xử lý III.1: Thống kê đội bóng ---")
     team_stats = df.groupby('team')[numeric_cols].agg(['mean', 'median', 'std'])
     
+    team_stats.columns = [f"{col}_{stat}" for col, stat in team_stats.columns]
+    
     team_stats.to_csv(output_path + 'Team_Statistics.csv')
     print("✅ Đã xuất file Team_Statistics.csv")
+
+def player_valuation(df):
+    print("--- Đang xử lý III.2: Định giá cầu thủ ---")
+    df['Estimated_Value_M'] = (
+        df['goals'] * 1.5 + 
+        df['assists'] * 1.2 + 
+        (df['minutes'] / 90) * 0.5 - 
+        (df['age'] - 20) * 0.3
+    ).clip(lower=0)
     
-    if 'Gls' in df.columns: 
-        best_attack_team = df.groupby('team')['Gls'].mean().idxmax()
-        print(f"🏆 Đội có hiệu suất ghi bàn trung bình cao nhất: {best_attack_team}")
+    return df
 
+if __name__ == "__main__":
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
 
-def calculate_valuation(df):
-    print("\n--- Đang xử lý III.2: Định giá cầu thủ ---")
+    df, numeric_cols = load_and_clean_data()
+    team_statistics(df, numeric_cols)
+    df = player_valuation(df)
 
-    try:
-        df['Age_num'] = pd.to_numeric(df['age'].astype(str).str[:2], errors='coerce').fillna(25)
-        df['Valuation_Score'] = (df['goals']*10 + df['assists']*8 + df['minutes']/90) / df['Age_num']
-        
-        df['Estimated_Value_M'] = (df['Valuation_Score'] * 1.5).round(2)
-        print("✅ Đã tính toán xong cột Estimated_Value_M (Giá trị ước tính)")
-    except KeyError as e:
-        print(f"⚠️ Cột không tồn tại để tính định giá: {e}. Vui lòng check lại tên cột trong SQLite.")
-
-
-def run_machine_learning(df, numeric_cols):
-    print("\n--- Đang xử lý III.3: Phân cụm và Giảm chiều dữ liệu ---")
+    print("--- Đang xử lý III.3: Phân cụm & PCA ---")
+    features = ['goals_per90', 'assists_per90', 'minutes_90s', 'age']
+    X = df[features]
     
-    X = df[numeric_cols].values
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
-    inertia = []
-    sil_scores = []
-    K_range = range(2, 11)
-
-    for k in K_range:
-        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-        kmeans.fit(X_scaled)
-        inertia.append(kmeans.inertia_)
-        sil_scores.append(silhouette_score(X_scaled, kmeans.labels_))
-
-    fig, ax = plt.subplots(1, 2, figsize=(15, 5))
-    
-    ax[0].plot(K_range, inertia, marker='o', color='b')
-    ax[0].set_title('Phương pháp Elbow (Tìm K tối ưu)')
-    ax[0].set_xlabel('Số lượng cụm (K)')
-    ax[0].set_ylabel('Inertia (Tổng bình phương khoảng cách)')
-
-    ax[1].plot(K_range, sil_scores, marker='s', color='r')
-    ax[1].set_title('Điểm Silhouette (Đánh giá độ tách biệt)')
-    ax[1].set_xlabel('Số lượng cụm (K)')
-    ax[1].set_ylabel('Silhouette Score')
-    
-    plt.tight_layout()
-    plt.savefig(output_path + 'KMeans_Evaluation.png')
-    print("✅ Đã lưu biểu đồ đánh giá K-Means (KMeans_Evaluation.png)")
-
-    optimal_k = 4
-    kmeans_final = KMeans(n_clusters=optimal_k, random_state=42, n_init=10)
+    kmeans_final = KMeans(n_clusters=4, random_state=42, n_init=10)
     df['Cluster'] = kmeans_final.fit_predict(X_scaled)
 
     pca_2d = PCA(n_components=2)
@@ -95,32 +76,39 @@ def run_machine_learning(df, numeric_cols):
     df['PCA1'] = X_pca_2d[:, 0]
     df['PCA2'] = X_pca_2d[:, 1]
 
-    pca_3d = PCA(n_components=3)
-    X_pca_3d = pca_3d.fit_transform(X_scaled)
-    df['PCA3'] = X_pca_3d[:, 2]
-
     plt.figure(figsize=(10, 6))
     sns.scatterplot(x='PCA1', y='PCA2', hue='Cluster', data=df, palette='viridis', alpha=0.7)
     plt.title('Phân cụm cầu thủ (PCA 2D Projection)')
     plt.savefig(output_path + 'PCA_2D_Clusters.png')
-    print("✅ Đã lưu biểu đồ PCA 2D (PCA_2D_Clusters.png)")
+    print("✅ Đã lưu biểu đồ PCA 2D")
 
-    fig = plt.figure(figsize=(10, 8))
-    ax3d = fig.add_subplot(111, projection='3d')
-    scatter = ax3d.scatter(df['PCA1'], df['PCA2'], df['PCA3'], c=df['Cluster'], cmap='viridis', s=40, alpha=0.7)
-    ax3d.set_xlabel('PCA Component 1')
-    ax3d.set_ylabel('PCA Component 2')
-    ax3d.set_zlabel('PCA Component 3')
-    ax3d.set_title('Phân cụm cầu thủ (PCA 3D Projection)')
-    plt.colorbar(scatter, label='Cluster')
-    plt.savefig(output_path + 'PCA_3D_Clusters.png')
-    print("✅ Đã lưu biểu đồ PCA 3D (PCA_3D_Clusters.png)")
 
-if __name__ == "__main__":
-    df_clean, num_columns = load_and_clean_data()
-    team_statistics(df_clean, num_columns)
-    calculate_valuation(df_clean)
-    run_machine_learning(df_clean, num_columns)
+    preferred_order = [
+        'player', 'team', 'position', 'age', 'birth_year', 'nationality', 
+  
+        'games', 'games_starts', 'minutes', 'minutes_90s',
+
+        'goals', 'goals_pens', 'assists', 'goals_assists', 'pens_made', 'pens_att',
+   
+        'cards_yellow', 'cards_red',
+        
+        'transfer_value', 'Estimated_Value_M',
+        
+        'goals_per90', 'assists_per90', 'goals_assists_per90', 
+        'goals_pens_per90', 'goals_assists_pens_per90',
+        
+        'Cluster', 'PCA1', 'PCA2',
+
+        'matches'
+    ]
+
+
+    existing_cols = [col for col in preferred_order if col in df.columns]
+    other_cols = [col for col in df.columns if col not in preferred_order]
     
-    df_clean.to_csv(output_path + "Final_Players_Data.csv", index=False, encoding='utf-8-sig')
-    print("✅ Đã xuất file tổng hợp Final_Players_Data.csv để kiểm tra định giá và phân cụm!")
+
+    df_final = df[existing_cols + other_cols]
+    df_final.to_csv(output_path + "Final_Players_Data.csv", index=False, encoding='utf-8-sig')
+    
+    print(f"✅ Đã lưu file tổng hợp hoàn chỉnh tại: {output_path}Final_Players_Data.csv")
+    print("🎉 TẤT CẢ CÔNG VIỆC ĐÃ HOÀN TẤT!")
