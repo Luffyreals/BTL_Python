@@ -1,0 +1,23 @@
+﻿player,team,position,age,birth_year,nationality,games,games_starts,minutes,minutes_90s,goals,goals_pens,assists,goals_assists,pens_made,pens_att,cards_yellow,cards_red,transfer_value,goals_per90,assists_per90,goals_assists_per90,goals_pens_per90,goals_assists_pens_per90,matches
+Calafiori Riccardo,Arsenal,DF,22,2002,it ITA,19,11,983,10.9,2,2,1,3,0,0,4,0,53883002,0.18,0.09,0.27,0.18,0.27,Matches
+Havertz Kai,Arsenal,FW,25,1999,de GER,23,21,1875,20.8,9,9,3,12,0,0,5,0,69957843,0.43,0.14,0.58,0.43,0.58,Matches
+Jesus Gabriel,Arsenal,FW,27,1997,br BRA,17,6,608,6.8,3,3,0,3,0,0,4,0,59130000,0.44,0.00,0.44,0.44,0.44,Matches
+Jorginho,Arsenal,MF,32,1991,it ITA,15,9,704,7.8,0,0,0,0,0,0,5,0,N/a,0.00,0.00,0.00,0.00,0.00,Matches
+Kiwior Jakub,Arsenal,DF,24,2000,pl POL,17,10,1122,12.5,1,1,0,1,0,0,1,0,N/a,0.08,0.00,0.08,0.08,0.08,Matches
+Lewis-Skelly Myles,Arsenal,DF,17,2006,eng ENG,23,15,1369,15.2,1,1,0,1,0,0,3,2,60582810,0.07,0.00,0.07,0.07,0.07,Matches
+Magalhães Gabriel,Arsenal,DF,26,1997,br BRA,28,28,2363,26.3,3,3,1,4,0,0,4,0,76230583,0.11,0.04,0.15,0.11,0.15,Matches
+Martinelli Gabriel,Arsenal,"FW,MF",23,2001,br BRA,33,25,2290,25.4,8,8,4,12,0,0,1,0,82739476,0.31,0.16,0.47,0.31,0.47,Matches
+Merino Mikel,Arsenal,"MF,FW",28,1996,es ESP,28,17,1586,17.6,7,7,2,9,0,0,4,1,51642471,0.40,0.11,0.51,0.40,0.51,Matches
+Nwaneri Ethan,Arsenal,"FW,MF",17,2007,eng ENG,26,11,895,9.9,4,4,2,6,0,0,1,0,N/a,0.40,0.20,0.60,0.40,0.60,Matches
+Partey Thomas,Arsenal,"MF,DF",31,1993,gh GHA,35,31,2797,31.1,4,4,2,6,0,0,4,0,N/a,0.13,0.06,0.19,0.13,0.19,Matches
+Raya David,Arsenal,GK,28,1995,es ESP,38,38,3420,38.0,0,0,0,0,0,0,3,0,47770298,0.00,0.00,0.00,0.00,0.00,Matches
+Rice Declan,Arsenal,MF,25,1999,eng ENG,35,33,2825,31.4,4,4,7,11,0,0,7,1,121119286,0.13,0.22,0.35,0.13,0.35,Matches
+Saka Bukayo,Arsenal,"FW,MF",22,2001,eng ENG,25,20,1729,19.2,6,5,10,16,1,1,3,0,145949345,0.31,0.52,0.83,0.26,0.78,Matches
+Saliba William,Arsenal,DF,23,2001,fr FRA,35,35,3039,33.8,2,2,0,2,0,0,2,1,79520000,0.06,0.00,0.06,0.06,0.06,Matches
+Sterling Raheem,Arsenal,"FW,MF",29,1994,eng ENG,17,7,499,5.5,0,0,2,2,0,0,1,0,N/a,0.00,0.36,0.36,0.00,0.36,Matches
+Tierney Kieran,Arsenal,DF,27,1997,sct SCO,13,2,259,2.9,1,1,0,1,0,0,0,0,N/a,0.35,0.00,0.35,0.35,0.35,Matches
+Timber Jurriën,Arsenal,DF,23,2001,nl NED,30,27,2417,26.9,1,1,3,4,0,0,7,0,68531080,0.04,0.11,0.15,0.04,0.15,Matches
+Trossard Leandro,Arsenal,FW,29,1994,be BEL,38,28,2546,28.3,8,8,7,15,0,0,4,1,35107016,0.28,0.25,0.53,0.28,0.53,Matches
+White Ben,Arsenal,DF,26,1997,eng ENG,17,13,1198,13.3,0,0,2,2,0,0,2,0,77202061,0.00,0.15,0.15,0.00,0.15,Matches
+Zinchenko Oleksandr,Arsenal,"DF,MF",27,1996,ua UKR,15,5,527,5.9,0,0,1,1,0,0,1,0,N/a,0.00,0.17,0.17,0.00,0.17,Matches
+Ødegaard Martin,Arsenal,MF,25,1998,no NOR,30,26,2325,25.8,3,2,8,11,1,1,4,0,143515566,0.12,0.31,0.43,0.08,0.39,Matches
