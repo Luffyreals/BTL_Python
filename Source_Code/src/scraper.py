@@ -112,18 +112,6 @@ def save_to_sqlite(data):
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_player ON player_stats(player)")
     conn.close()
 
-
-def init_driver():
-    options = webdriver.ChromeOptions()
-    # Chặn pop-up thông báo từ hệ thống trình duyệt
-    prefs = {"profile.default_content_setting_values.notifications": 2}
-    options.add_experimental_option("prefs", prefs)
-    
-    # Một số cấu hình giúp trình duyệt ổn định hơn
-    options.add_argument("--disable-popup-blocking")
-    options.add_argument("--start-maximized") # Mở rộng màn hình để dễ tìm phần tử
-    
-    return webdriver.Chrome(options=options)
 def safe_get(url):
     headers = {"User-Agent": "Mozilla/5.0"}
     for _ in range(3):
